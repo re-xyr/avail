@@ -1,0 +1,48 @@
+name:                avail
+version:             0.1.0.0
+github:              "re-xyr/avail"
+license:             BSD3
+author:              "Xy Ren"
+maintainer:          "xy.r@outlook.com"
+copyright:           "2021 Xy Ren"
+
+extra-source-files:
+- README.md
+- CHANGELOG.md
+
+synopsis:            Low-overhead effect management for concrete monads
+category:            Control
+
+description:         Please see the README on GitHub at <https://github.com/re-xyr/avail#readme>
+
+dependencies:
+- base >= 4.14 && < 5
+- capability >= 0.4 && < 0.6
+- exceptions >= 0.10 && < 0.11
+- monad-control >= 1.0 && < 1.1
+- mtl >= 2.2 && < 2.3
+- primitive >= 0.7 && < 0.8
+- template-haskell >= 2.16 && < 3
+- transformers-base >= 0.4 && < 0.5
+- unliftio-core >= 0.2 && < 0.3
+
+library:
+  source-dirs: src
+
+default-extensions:
+- ConstraintKinds
+- DataKinds
+- DerivingVia
+- FlexibleContexts
+- FlexibleInstances
+- KindSignatures
+- MultiParamTypeClasses
+- PolyKinds
+- RankNTypes
+- ScopedTypeVariables
+- StandaloneDeriving
+- TemplateHaskell
+- TypeApplications
+- TypeFamilies
+- TypeOperators
+- UndecidableInstances
