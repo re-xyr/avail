@@ -2,6 +2,20 @@
 -- | This module contains mechanisms for deriving necessary instances for a new 'Effect' typeclass to work with
 -- @avail@. If you only need functionalities from @mtl@, @monad-control@, @unliftio@ and @capability@, you don't need
 -- to use this module.
+--
+-- You need these extensions when using the module:
+--
+-- @
+-- DataKinds
+-- DerivingStrategies
+-- FlexibleContexts
+-- FlexibleInstances
+-- GeneralizedNewtypeDeriving
+-- StandaloneDeriving
+-- TemplateHaskell
+-- TypeFamilies
+-- UndecidableInstances
+-- @
 module Avail.Derive
   ( -- * Deriving
     avail, avail'
@@ -13,7 +27,6 @@ module Avail.Derive
   ) where
 
 import           Avail.Internal
-import           Data.Kind           (Type)
 import           Language.Haskell.TH hiding (Type)
 import qualified Language.Haskell.TH as TH
 
@@ -30,8 +43,11 @@ avail = avail' []
 -- @
 -- instance 'IsEff' Cls where
 --   type 'Superclasses' Cls = Sup
--- deriving via (m :: 'Type' -> 'Type') instance (Cls m, 'Eff' Cls) => Cls ('M' m)
+-- deriving newtype instance (Cls m, 'Eff' Cls) => Cls ('M' m)
 -- @
+--
+-- Although this is very little code, it is still boilerplate and defining them by hand is error-prone. Therefore,
+-- /please/ do not define instances for 'M' by hand (except when doing dirty hacks); use this function instead.
 avail' :: [Q TH.Type] -> Q TH.Type -> Q [Dec]
 avail' = avail'' $ \m -> [t| M $m |]
 
@@ -43,9 +59,8 @@ avail'' mm pre cls = do
   isEff <- [d|
     instance IsEff $cls where
       type Superclasses $cls = $(makeList <$> sequence pre) |]
-  deriv <- StandaloneDerivD
-    <$> (Just . ViaStrategy <$> [t| $mTy :: Type -> Type |])
-    <*> sequence [[t| $cls $mTy |], [t| Eff $cls |]]
+  deriv <- StandaloneDerivD (Just NewtypeStrategy)
+    <$> sequence [[t| $cls $mTy |], [t| Eff $cls |]]
     <*> [t| $cls $mmTy |]
   pure (deriv : isEff)
   where

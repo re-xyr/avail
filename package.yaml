@@ -39,9 +39,10 @@ library:
 default-extensions:
 - ConstraintKinds
 - DataKinds
-- DerivingVia
+- DerivingStrategies
 - FlexibleContexts
 - FlexibleInstances
+- GeneralizedNewtypeDeriving
 - KindSignatures
 - MultiParamTypeClasses
 - PolyKinds

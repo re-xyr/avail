@@ -1,7 +1,6 @@
 -- | This module defines the 'M' wrapper monad and the 'Eff' phantom constraint. All safe functionalities in this
 -- module are reexported in the "Avail" module, so you wouldn't need to import this module most of the times.
-{-# LANGUAGE AllowAmbiguousTypes        #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
 {-# OPTIONS_HADDOCK not-home #-}
 module Avail.Internal where
 

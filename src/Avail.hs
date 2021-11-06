@@ -24,6 +24,16 @@
 -- @avail@ already supports libraries including @mtl@, @unliftio@, @monad-control@ and @capability@ out of the box, so
 -- there should be near-zero boilerplate to get started with @avail@. For other monad typeclasses, the @avail@ support
 -- of them can be easily derived via the TH functions in "Avail.Derive".
+--
+-- You need these language extensions when using this module:
+--
+-- @
+-- DataKinds
+-- RankNTypes
+-- TypeApplications
+-- @
+--
+-- You need more extensions when using "Avail.Derive"; see documentation in that module.
 module Avail
   ( M, Effect, IsEff (Superclasses), Eff, Effs, KnownList, unM, runM
   ) where
