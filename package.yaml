@@ -26,6 +26,13 @@ dependencies:
 - transformers-base >= 0.4 && < 0.5
 - unliftio-core >= 0.2 && < 0.3
 
+ghc-options:
+- -Wall
+- -Wincomplete-uni-patterns
+- -Wpartial-fields
+- -Wincomplete-record-updates
+- -Widentities
+
 library:
   source-dirs: src
 

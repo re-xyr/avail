@@ -52,6 +52,7 @@ library
       TypeFamilies
       TypeOperators
       UndecidableInstances
+  ghc-options: -Wall -Wincomplete-uni-patterns -Wpartial-fields -Wincomplete-record-updates -Widentities
   build-depends:
       base >=4.14 && <5
     , capability >=0.4 && <0.6

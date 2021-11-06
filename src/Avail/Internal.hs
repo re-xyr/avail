@@ -1,3 +1,5 @@
+-- | This module defines the 'M' wrapper monad and the 'Eff' phantom constraint. All safe functionalities in this
+-- module are reexported in the "Avail" module, so you wouldn't need to import this module most of the times.
 {-# LANGUAGE AllowAmbiguousTypes        #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# OPTIONS_HADDOCK not-home #-}
@@ -24,14 +26,18 @@ type Effect = (Type -> Type) -> Constraint
 -- You won't need to define instances of this by hand; instead, use the 'Avail.Derive.avail'' Template Haskell
 -- function.
 class KnownList (Superclasses e) => IsEff (e :: Effect) where
+  -- | The superclasses of this typeclass.
   type Superclasses e :: [Effect]
 
-class IsEff e => Eff' (e :: Effect) where
+-- | The /primitive/ phantom effect constraint that does not take superclasses into account. You should not use this
+-- directly; use 'Eff' or 'Effs' instead. Additionally, you definitely shouldn't define instances for this class.
+class Eff' (e :: Effect) where
+  -- | The dummy method of the phantom typeclass, to be instantiated via the reflection trick in 'rip''.
   instEffect :: Proxy e
   instEffect = error "unimplemented"
 
 -- | The constraint that indicates an effect is available to use, i.e. you can perform effect operations defined by the
--- typeclass 'e'.
+-- typeclass @e@.
 type Eff (e :: Effect) = (Eff' e, Effs (Superclasses e))
 
 -- | Convenient alias for @('Eff' e1, 'Eff' e2, ..., 'Eff' en)@.
@@ -39,16 +45,21 @@ type family Effs (es :: [Effect]) :: Constraint where
   Effs '[] = ()
   Effs (e ': es) = (Eff e, Effs es)
 
+-- | The newtype wrapper used to perform the reflection trick in 'rip''.
 newtype InstEff e a = InstEff (Eff' e => a)
 
+-- | Brutally rip off an 'Eff'' constraint.
 rip' :: forall e a. (Eff' e => a) -> a
 rip' x = unsafeCoerce (InstEff @e x) Proxy
 
+-- | Brutally rip off an 'Eff' constraint. This means 'rip''ing off the 'Eff'' constraint of the current 'Effect' and
+-- then rip off constraints of all 'Superclasses' recursively.
 rip :: forall e a. IsEff e => (Eff e => a) -> a
 rip x = rips @(Superclasses e) $ rip' @e x
 
 -- | The list of effects @es@ is known at compile time. This is required for functions like 'runM'.
 class KnownList (es :: [Effect]) where
+  -- | Brutally rip off many 'Eff' constraints.
   rips :: (Effs es => a) -> a
   rips _ = error "unimplemented"
 

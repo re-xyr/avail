@@ -18,9 +18,9 @@ where `App` is a specific, concrete monad stack.
 
 Current effects libraries all have one principle of effect restriction: an effect can be used in a monad if it can be interpreted in terms of the monad. This works well with a polymorphic monad type, but a polymorphic type is unfriendly to compiler optimization. In contrast, a concrete monad can be easily optimized, but if we fix a monad that supplies all the effects we need, we can no longer restrict what effects each function can use.
 
-`avail` solves this problem with the [*phantom constraint pattern*](https://xn--i2r.xn--rhqv96g/2021/09/14/redundant-constraints/). We use a newtype wrapper `M` to screen out the user from directly manipulating the underlying monad, and let user to implement interpretations of effects in terms of other more primitive effects. In any function, the user can use an effect only if:
+`avail` solves this problem with the [*phantom constraint pattern*](https://xn--i2r.xn--rhqv96g/2021/09/14/redundant-constraints/). We use a newtype wrapper `M` to screen out the user from directly manipulating the underlying monad, and performing any operation in a typeclass (for example, `MonadIO`) requires the corresponding *phantom* `Eff` constraint (in this case. `Eff MonadIO`) to be in scope. In other words, one can perform operations of a class only if:
 
-- The effect is implemented for the monad, and
+- The class is implemented for the monad, and
 - The *effect constraint* `Eff e` is available in the context.
 
 The second requirement decouples the availability of effects from the monad implementation. At last, we use a function `runM` to clear the constraints and restore the underlying monad. A typical example looks like this:

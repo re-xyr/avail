@@ -25,8 +25,8 @@
 -- there should be near-zero boilerplate to get started with @avail@. For other monad typeclasses, the @avail@ support
 -- of them can be easily derived via the TH functions in "Avail.Derive".
 module Avail
-  ( M, Effect, IsEff, Eff, Effs, KnownList, unM, runM
+  ( M, Effect, IsEff (Superclasses), Eff, Effs, KnownList, unM, runM
   ) where
 
-import           Avail.Instances
+import           Avail.Instances ()
 import           Avail.Internal
