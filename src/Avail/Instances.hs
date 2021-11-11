@@ -26,27 +26,27 @@ import           Control.Monad.State         (MonadState)
 import           Control.Monad.Trans.Control (MonadBaseControl)
 import           Control.Monad.Writer        (MonadWriter)
 
--- * @unliftio@
+-- unliftio
 
 avail [t| MonadIO |]
 avail' [[t| MonadIO |]] [t| MonadUnliftIO |]
 
--- * @monad-control@
+-- monad-control
 
 with1' "b" $ \b -> avail [t| MonadBase $b |]
 with1' "b" $ \b -> avail' [[t| MonadBase $b |]] [t| MonadBaseControl $b |]
 
--- * @exceptions@
+-- exceptions
 
 avail [t| MonadThrow |]
 avail' [[t| MonadThrow |]] [t| MonadCatch |]
 avail' [[t| MonadCatch |]] [t| MonadMask |]
 
--- * @primitive@
+-- primitive
 
 avail [t| PrimMonad |]
 
--- * @mtl@
+-- mtl
 
 avail [t| MonadCont |]
 with1' "r" $ \r -> avail [t| MonadReader $r |]
@@ -59,7 +59,7 @@ with3' "r" "w" "s" $ \r w s -> avail'
   , [t| MonadState $s |]
   ] [t| MonadRWS $r $w $s |]
 
--- * @capability@
+-- capability
 
 with2' "tag" "a" $ \tag a -> avail [t| HasSource $tag $a |]
 with2' "tag" "a" $ \tag a -> avail [t| HasSink $tag $a |]

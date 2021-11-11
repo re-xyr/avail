@@ -34,7 +34,7 @@ type App = M (ReaderT Int (State Bool))
 
 testParity :: Effs '[MonadReader Int, MonadState Bool] => App ()
 testParity = do
-  num <- ask @Int
+  num <- ask
   put (even num)
 
 example :: IO ()

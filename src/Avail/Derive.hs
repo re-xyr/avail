@@ -31,7 +31,7 @@ import           Language.Haskell.TH hiding (Type)
 import qualified Language.Haskell.TH as TH
 
 -- | Derive necessary instances for an 'Effect' typeclass to work with @avail@. Specifically, this only works with
--- typeclasses without superclasses; see 'avail'' for a version that considers superclasses.
+-- typeclasses without superclasses; see 'avail'' for a version that takes care of superclasses.
 avail :: Q TH.Type -> Q [Dec]
 avail = avail' []
 
@@ -53,16 +53,12 @@ avail' = avail'' $ \m -> [t| M $m |]
 
 avail'' :: (Q TH.Type -> Q TH.Type) -> [Q TH.Type] -> Q TH.Type -> Q [Dec]
 avail'' mm pre cls = do
-  m <- newName "m"
-  let mTy = pure $ VarT m
-  let mmTy = mm mTy
-  isEff <- [d|
+  mName <- newName "m"
+  let m = pure $ VarT mName
+  [d|
     instance IsEff $cls where
-      type Superclasses $cls = $(makeList <$> sequence pre) |]
-  deriv <- StandaloneDerivD (Just NewtypeStrategy)
-    <$> sequence [[t| $cls $mTy |], [t| Eff $cls |]]
-    <*> [t| $cls $mmTy |]
-  pure (deriv : isEff)
+      type Superclasses $cls = $(makeList <$> sequence pre)
+    deriving newtype instance ($cls $m, Eff $cls) => $cls $(mm m) |]
   where
     makeList []       = PromotedNilT
     makeList (x : xs) = PromotedConsT `AppT` x `AppT` makeList xs

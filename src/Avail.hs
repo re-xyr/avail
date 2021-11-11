@@ -1,34 +1,41 @@
--- | @avail@ is a companion to monad transformers that allows you to use a concrete monad with effect management. In
--- traditional approaches to monad transformers, one usually writes:
+-- | @avail@ is a companion to monad transformers that allows you to add effect management to /concrete monads/,
+-- i.e. specify what effects a piece of code can perform.
+--
+-- Traditionally, in order to manage effects, the /effect typeclasses/ are placed on a polymorphic monad type
+-- @m@ so that other details of the monad type is not known at that point, effectively limiting what a function can do:
 --
 -- @
 -- (MonadWriter Log m, MonadState Store m, MonadReader Env m) => m ()
 -- @
 --
 -- While this works well, it has inevitable performance drawback because of the polymorphic @m@. GHC doesn't know the
--- implementation of @m@, hence cannot perform much optimization. In contrast, if we use a concrete monad @MyM@ that
--- interprets all effects we need, we will not be able to restrict the effects that can be performed.
+-- implementation of @m@, hence cannot perform much optimization. On the other hand, if we use a concrete monad stack
+-- that supports all the effects we need, we will not be able to restrict the effects that can be performed.
 --
--- @avail@ addresses this by the /phantom constraint pattern/, where an effect r can be performed if and only if:
+-- @avail@ addresses this by a monad transformer 'M'. For any monad @m@, the monad type @'M' m@ adds effect
+-- management on top of it. Specifically, for an effect typeclass @c@ (such as 'Control.Monad.MonadIO' or
+-- @'Control.Monad.Reader.MonadReader' r@), its methods can be used on @'M' m@ only if:
 --
--- * The monad is /capable of/ interpreting this effect,
--- * The effect is /available/ in current context, i.e. a phantom constraint @'Eff' r@, which doesn't contain any
--- information, is in the context.
+-- * The monad @m@ actually supports the effect, i.e. has an instance @c m@ of the effect typeclass;
+-- * The effect is /available/ in current context, i.e. a /phantom constraint/ @'Eff' c@ (which doesn't contain any
+-- information) is added to the function signature.
 --
--- This pattern is outlined in the blog post
+-- This pattern was first outlined in the blog post
 -- [/Effect is a phantom/](https://喵.世界/2021/09/14/redundant-constraints/).
--- In @avail@, the usage of this pattern allows you to control the effect via the phantom 'Eff' constraint, while
--- using a concrete monad, because the phantom constraint 'Eff' is not tied to the monad. 'Eff' has no instances, and
--- can only be removed all at once, obtaining the underlying monad, via the 'runM' function.
+-- In @avail@, it allows you to manage effects via the phantom 'Eff' constraint while still using a
+-- concrete monad stack; the 'Eff' constarint is not tied to the stack anyhow. Finally, 'Eff' has no instances,
+-- and can only be removed all at once via the 'runM' function, obtaining the underlying monad.
 --
--- @avail@ already supports libraries including @mtl@, @unliftio@, @monad-control@ and @capability@ out of the box, so
--- there should be near-zero boilerplate to get started with @avail@. For other monad typeclasses, the @avail@ support
+-- @avail@ supports libraries including @mtl@, @unliftio@, @monad-control@ and @capability@ out of the box, so there
+-- should be near-zero boilerplate to get started with @avail@. For other effect typeclasses, the @avail@ support
 -- of them can be easily derived via the TH functions in "Avail.Derive".
 --
 -- You need these language extensions when using this module:
 --
 -- @
 -- DataKinds
+-- FlexibleContexts
+-- FlexibleInstances
 -- RankNTypes
 -- TypeApplications
 -- @
