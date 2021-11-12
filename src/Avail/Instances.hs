@@ -13,10 +13,13 @@ import           Capability.Sink             (HasSink)
 import           Capability.Source           (HasSource)
 import           Capability.State            (HasState)
 import           Capability.Writer           (HasWriter)
+import           Control.Applicative         (Alternative)
+import           Control.Monad               (MonadPlus)
 import           Control.Monad.Base          (MonadBase)
 import           Control.Monad.Catch         (MonadCatch, MonadMask, MonadThrow)
 import           Control.Monad.Cont          (MonadCont)
 import           Control.Monad.Except        (MonadError)
+import           Control.Monad.Fail          (MonadFail)
 import           Control.Monad.IO.Class      (MonadIO)
 import           Control.Monad.IO.Unlift     (MonadUnliftIO)
 import           Control.Monad.Primitive     (PrimMonad)
@@ -25,10 +28,17 @@ import           Control.Monad.Reader        (MonadReader)
 import           Control.Monad.State         (MonadState)
 import           Control.Monad.Trans.Control (MonadBaseControl)
 import           Control.Monad.Writer        (MonadWriter)
+import           Prelude                     hiding (MonadFail)
+
+-- base
+
+avail [t| MonadIO |]
+avail [t| MonadFail |]
+avail [t| Alternative |]
+avail' [[t| Alternative |]] [t| MonadPlus |]
 
 -- unliftio
 
-avail [t| MonadIO |]
 avail' [[t| MonadIO |]] [t| MonadUnliftIO |]
 
 -- monad-control

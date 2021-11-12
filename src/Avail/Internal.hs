@@ -4,9 +4,11 @@
 {-# OPTIONS_HADDOCK not-home #-}
 module Avail.Internal where
 
-import           Data.Kind     (Constraint, Type)
-import           Data.Proxy    (Proxy (Proxy))
-import           Unsafe.Coerce (unsafeCoerce)
+import           Control.Monad.Fix (MonadFix)
+import           Control.Monad.Zip (MonadZip)
+import           Data.Kind         (Constraint, Type)
+import           Data.Proxy        (Proxy (Proxy))
+import           Unsafe.Coerce     (unsafeCoerce)
 
 -- | The 'M' monad transformer acts as a /barrier of effects/. For example, for a monad type @App@ and any
 -- effect typeclass @MonadOvO@ that @App@ has an instance of, the constraint @Eff MonadOvO@ is required to perform
@@ -25,7 +27,8 @@ import           Unsafe.Coerce (unsafeCoerce)
 -- f :: 'Eff' ('Control.Monad.State.MonadState' 'Int') => 'M' App ()
 -- @
 --
--- where @App@ is a monad stack of your choice that has support of @'Control.Monad.State.MonadState' 'Int'@.
+-- where @App@ is a monad stack of your choice that has support of @'Control.Monad.State.MonadState' 'Int'@. This also
+-- means there is no 'Control.Monad.Trans.Class.MonadTrans' instance for 'M'.
 --
 -- Note: __you should not define instances of 'M' for effect typeclasses directly by hand__ as that is error-prone
 -- and may create holes in effect management. For defining instances of effect typeclasses for 'M', check out
@@ -35,7 +38,7 @@ import           Unsafe.Coerce (unsafeCoerce)
 -- with 'M' out-of-the-box so no instance for them is needed to be defined on 'M' /by you/.
 newtype M m a = UnsafeLift (m a) -- ^ Unsafely lift an @m@ action into @'M' m@. This completely sidesteps the
                                  -- effect management mechanism; __You should not use this.__
-  deriving newtype (Semigroup, Monoid, Functor, Applicative, Monad)
+  deriving newtype (Functor, Applicative, Monad, MonadFix, MonadZip)
 
 -- | The kind of /effect typeclasses/, i.e. those that define a set of operations on a monad. Examples include
 -- 'Control.Monad.IO.Class.MonadIO' and 'Control.Monad.Reader.MonadReader'.
