@@ -42,6 +42,7 @@ import           Data.Functor.Bind  (Bind (join, (>>-)))
 --
 -- Also keep in mind that typeclasses inside @mtl@, @exceptions@, @unliftio@, @monad-control@ and @capability@ work
 -- with 'M' out-of-the-box so no instance for them is needed to be defined on 'M' /by you/.
+
 newtype M m a = UnsafeLift (m a) -- ^ Unsafely lift an @m@ action into @'M' m@. This completely sidesteps the
                                  -- effect management mechanism; __You should not use this.__
   deriving newtype (Functor, Applicative, Monad, MonadFix, MonadZip)
@@ -108,7 +109,7 @@ class KnownList (es :: [Effect]) where
   rips _ = error "unimplemented"
 
 instance KnownList '[] where
-  rips = id
+  rips x = x
 
 instance (IsEff e, KnownList es) => KnownList (e ': es) where
   rips x = rips @es $ rip @e x

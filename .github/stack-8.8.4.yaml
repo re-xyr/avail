@@ -1,0 +1,17 @@
+resolver: lts-16.31
+
+packages:
+- .
+
+flags:
+  avail:
+    capability: false
+    exceptions: true
+    monad-control: true
+    mtl: true
+    primitive: true
+    semigroupoids: true
+    unliftio: false
+
+ghc-options:
+  "$everything": -haddock

@@ -6,6 +6,13 @@ author:              "Xy Ren"
 maintainer:          "xy.r@outlook.com"
 copyright:           "2021 Xy Ren"
 
+tested-on:
+- GHC == 8.6.5
+- GHC == 8.8.4
+- GHC == 8.10.7
+- GHC == 9.0.2
+- GHC == 9.2.2
+
 extra-source-files:
 - README.md
 - CHANGELOG.md
@@ -16,12 +23,12 @@ category:            Control
 description:         Please see the README on GitHub at <https://github.com/re-xyr/avail#readme>
 
 dependencies:
-- base >= 4.10 && < 5
+- base >= 4.12 && < 5
 - template-haskell >= 2.14 && < 3
 
 flags:
   capability:
-    description: Supports the @capability@ library.
+    description: Supports the @capability@ library. Only for GHC >= 8.6.
     manual: true
     default: false
   exceptions:
@@ -95,13 +102,13 @@ when:
 
 - condition: flag(semigroupoids)
   dependencies:
-  - semigroupoids >= 1 && < 5.4
+  - semigroupoids >= 5 && < 5.4
   cpp-options:
   - -DAVAIL_semigroupoids
 
 - condition: flag(unliftio)
   dependencies:
-  - unliftio-core >= 0.1.1 && < 0.3
+  - unliftio-core >= 0.2 && < 0.3
   cpp-options:
   - -DAVAIL_unliftio
 
