@@ -1,4 +1,14 @@
-resolver: lts-18.15
+resolver: lts-18.28
 
 packages:
 - .
+
+flags:
+  avail:
+    capability: true
+    exceptions: true
+    monad-control: true
+    mtl: true
+    primitive: true
+    semigroupoids: true
+    unliftio: true

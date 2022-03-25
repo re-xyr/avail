@@ -1,14 +1,20 @@
 -- | This module defines the 'M' wrapper monad and the 'Eff' phantom constraint. All safe functionalities in this
 -- module are reexported in the "Avail" module, so you wouldn't need to import this module most of the times.
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE CPP                 #-}
 {-# OPTIONS_HADDOCK not-home #-}
 module Avail.Internal where
 
-import           Control.Monad.Fix (MonadFix)
-import           Control.Monad.Zip (MonadZip)
-import           Data.Kind         (Constraint, Type)
-import           Data.Proxy        (Proxy (Proxy))
-import           Unsafe.Coerce     (unsafeCoerce)
+import           Control.Monad.Fix  (MonadFix)
+import           Control.Monad.Zip  (MonadZip)
+import           Data.Kind          (Constraint, Type)
+import           Data.Proxy         (Proxy (Proxy))
+import           Unsafe.Coerce      (unsafeCoerce)
+
+#ifdef AVAIL_semigroupoids
+import           Data.Functor.Apply (Apply)
+import           Data.Functor.Bind  (Bind (join, (>>-)))
+#endif
 
 -- | The 'M' monad transformer acts as a /barrier of effects/. For example, for a monad type @App@ and any
 -- effect typeclass @MonadOvO@ that @App@ has an instance of, the constraint @Eff MonadOvO@ is required to perform
@@ -39,6 +45,14 @@ import           Unsafe.Coerce     (unsafeCoerce)
 newtype M m a = UnsafeLift (m a) -- ^ Unsafely lift an @m@ action into @'M' m@. This completely sidesteps the
                                  -- effect management mechanism; __You should not use this.__
   deriving newtype (Functor, Applicative, Monad, MonadFix, MonadZip)
+
+#ifdef AVAIL_semigroupoids
+deriving newtype instance Apply m => Apply (M m)
+
+instance Bind m => Bind (M m) where
+  UnsafeLift m >>- f = UnsafeLift $ m >>- (unM . f)
+  join (UnsafeLift m) = UnsafeLift $ join $ unM <$> m
+#endif
 
 -- | The kind of /effect typeclasses/, i.e. those that define a set of operations on a monad. Examples include
 -- 'Control.Monad.IO.Class.MonadIO' and 'Control.Monad.Reader.MonadReader'.

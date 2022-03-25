@@ -25,6 +25,41 @@ source-repository head
   type: git
   location: https://github.com/re-xyr/avail
 
+flag capability
+  description: Supports the @capability@ library.
+  manual: True
+  default: False
+
+flag exceptions
+  description: Supports the @exceptions@ library.
+  manual: True
+  default: True
+
+flag monad-control
+  description: Supports the @transformers-base@ and @monad-control@ library.
+  manual: True
+  default: False
+
+flag mtl
+  description: Supports the @mtl@ library.
+  manual: True
+  default: True
+
+flag primitive
+  description: Supports the @primitive@ library.
+  manual: True
+  default: True
+
+flag semigroupoids
+  description: Supports the @semigroupoids@ library.
+  manual: True
+  default: False
+
+flag unliftio
+  description: Supports the @unliftio@ library.
+  manual: True
+  default: True
+
 library
   exposed-modules:
       Avail
@@ -53,15 +88,39 @@ library
       TypeFamilies
       TypeOperators
       UndecidableInstances
-  ghc-options: -Wall -Wincomplete-uni-patterns -Wpartial-fields -Wincomplete-record-updates -Widentities
+  ghc-options: -Wall -Wincomplete-uni-patterns -Wpartial-fields -Wincomplete-record-updates -Widentities -Wunused-type-patterns
   build-depends:
-      base >=4.14 && <5
-    , capability >=0.4 && <0.6
-    , exceptions ==0.10.*
-    , monad-control ==1.0.*
-    , mtl ==2.2.*
-    , primitive ==0.7.*
-    , template-haskell >=2.16 && <3
-    , transformers-base ==0.4.*
-    , unliftio-core ==0.2.*
+      base >=4.10 && <5
+    , template-haskell >=2.14 && <3
+  if impl(ghc >= 8.8)
+    ghc-options: -Wmissing-deriving-strategies
+  if flag(capability)
+    cpp-options: -DAVAIL_capability
+    build-depends:
+        capability >=0.3 && <0.6
+  if flag(exceptions)
+    cpp-options: -DAVAIL_exceptions
+    build-depends:
+        exceptions ==0.10.*
+  if flag(monad-control)
+    cpp-options: -DAVAIL_monad_control
+    build-depends:
+        monad-control ==1.0.*
+      , transformers-base ==0.4.*
+  if flag(mtl)
+    cpp-options: -DAVAIL_mtl
+    build-depends:
+        mtl >=2.2.1 && <2.3
+  if flag(primitive)
+    cpp-options: -DAVAIL_primitive
+    build-depends:
+        primitive >=0.6 && <0.8
+  if flag(semigroupoids)
+    cpp-options: -DAVAIL_semigroupoids
+    build-depends:
+        semigroupoids >=1 && <5.4
+  if flag(unliftio)
+    cpp-options: -DAVAIL_unliftio
+    build-depends:
+        unliftio-core >=0.1.1 && <0.3
   default-language: Haskell2010

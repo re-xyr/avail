@@ -16,15 +16,38 @@ category:            Control
 description:         Please see the README on GitHub at <https://github.com/re-xyr/avail#readme>
 
 dependencies:
-- base >= 4.14 && < 5
-- capability >= 0.4 && < 0.6
-- exceptions >= 0.10 && < 0.11
-- monad-control >= 1.0 && < 1.1
-- mtl >= 2.2 && < 2.3
-- primitive >= 0.7 && < 0.8
-- template-haskell >= 2.16 && < 3
-- transformers-base >= 0.4 && < 0.5
-- unliftio-core >= 0.2 && < 0.3
+- base >= 4.10 && < 5
+- template-haskell >= 2.14 && < 3
+
+flags:
+  capability:
+    description: Supports the @capability@ library.
+    manual: true
+    default: false
+  exceptions:
+    description: Supports the @exceptions@ library.
+    manual: true
+    default: true
+  monad-control:
+    description: Supports the @transformers-base@ and @monad-control@ library.
+    manual: true
+    default: false
+  mtl:
+    description: Supports the @mtl@ library.
+    manual: true
+    default: true
+  primitive:
+    description: Supports the @primitive@ library.
+    manual: true
+    default: true
+  semigroupoids:
+    description: Supports the @semigroupoids@ library.
+    manual: true
+    default: false
+  unliftio:
+    description: Supports the @unliftio@ library.
+    manual: true
+    default: true
 
 ghc-options:
 - -Wall
@@ -32,6 +55,55 @@ ghc-options:
 - -Wpartial-fields
 - -Wincomplete-record-updates
 - -Widentities
+- -Wunused-type-patterns
+
+when:
+- condition: impl(ghc >= 8.8)
+  ghc-options:
+  - -Wmissing-deriving-strategies
+
+- condition: flag(capability)
+  dependencies:
+  - capability >= 0.3 && < 0.6
+  cpp-options:
+  - -DAVAIL_capability
+
+- condition: flag(exceptions)
+  dependencies:
+  - exceptions >= 0.10 && < 0.11
+  cpp-options:
+  - -DAVAIL_exceptions
+
+- condition: flag(monad-control)
+  dependencies:
+  - monad-control >= 1.0 && < 1.1
+  - transformers-base >= 0.4 && < 0.5
+  cpp-options:
+  - -DAVAIL_monad_control
+
+- condition: flag(mtl)
+  dependencies:
+  - mtl >= 2.2.1 && < 2.3
+  cpp-options:
+  - -DAVAIL_mtl
+
+- condition: flag(primitive)
+  dependencies:
+  - primitive >= 0.6 && < 0.8
+  cpp-options:
+  - -DAVAIL_primitive
+
+- condition: flag(semigroupoids)
+  dependencies:
+  - semigroupoids >= 1 && < 5.4
+  cpp-options:
+  - -DAVAIL_semigroupoids
+
+- condition: flag(unliftio)
+  dependencies:
+  - unliftio-core >= 0.1.1 && < 0.3
+  cpp-options:
+  - -DAVAIL_unliftio
 
 library:
   source-dirs: src
